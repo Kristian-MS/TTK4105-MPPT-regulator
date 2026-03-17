@@ -15,7 +15,7 @@ I_0 = 1e-4;
 % IRRADAINCE
 G_ref = 1/1000;
 tG = [0 1 2 3 4 5 6 7 8 9 10]';
-G  = [1000 0 1000 0 500 1000 100 1000 0 1000 0]';
+G  = [1000 1000 1000 1000 0 1000 1000 1000 1000 1000 0]';
 G_signal = timeseries(G,tG);
 
 % MPP fra plot
@@ -26,13 +26,14 @@ K_P = 0.2;
 K_i = 5;
 
 % Motstand variabler
-R_s = 0.2;
+R_s = 0;
 R_sh = 500;
 R_sh_inv = 1/R_sh;
 
 R_N = 0.8; %For å gjøre FF dårligere (dobbeltsjekk om er i sim)
+R_Nsh = 500;
 
-tau = 10^(-3); %For å beregne strøm i diode model (derivere)
+tau = 10^(-5); %For å beregne strøm i diode model (derivere)
 
 
 
@@ -44,7 +45,7 @@ i = I_L - I_0*(exp(v/(n*Vt))-1);
 P = v.*i;
 
 i2 = I_L -I_0*(exp((v+i*R_s)/(n*Vt))-1) - (v+i*R_s)/R_sh;
-i3 = I_L -I_0*(exp((v+i*R_N)/(n*Vt))-1) - (v+i*R_N)/R_sh;
+i3 = I_L -I_0*(exp((v+i*R_N)/(n*Vt))-1) - (v+i*R_N)/R_Nsh;
 P2 = v.*i2;
 P3 = v.*i3;
 
@@ -122,14 +123,17 @@ set(gca, 'FontSize', 12)
 t_v_irr  = out.v_FB_irr.Time;
 v_fb_irr = out.v_FB_irr.Data;
 v_ff_irr = out.v_FF_irr.Data;
+v_f_irr = out.v_F_irr.Data;
 
 t_i_irr  = out.i_FB_irr.Time;
 i_fb_irr = out.i_FB_irr.Data;
 i_ff_irr = out.i_FF_irr.Data;
+i_f_irr = out.i_F_irr.Data;
 
 t_p_irr  = out.P_FB_irr.Time;
 p_fb_irr = out.P_FB_irr.Data;
 p_ff_irr = out.P_FF_irr.Data;
+p_f_irr = out.P_F_irr.Data;
 
 figure(11)
 tiledlayout(4,1, "TileSpacing","compact", "Padding","compact")
@@ -148,9 +152,11 @@ plot(t_v_irr, v_fb_irr, 'LineWidth', 2)
 hold on
 plot(out.v_FF_irr.Time, v_ff_irr, '--', 'LineWidth', 2)
 grid on
+plot(out.v_F_irr.Time, v_f_irr, '--', 'LineWidth', 2)
+grid on
 ylabel('Voltage [V]', 'FontSize', 13)
 title('Voltage comparison: Feedback vs Feedforward (with irradiance disturbance)', 'FontSize', 14)
-legend('Feedback', 'Feedforward', 'Location', 'best')
+legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 % ---------------- Current ----------------
@@ -159,9 +165,11 @@ plot(t_i_irr, i_fb_irr, 'LineWidth', 2)
 hold on
 plot(out.i_FF_irr.Time, i_ff_irr, '--', 'LineWidth', 2)
 grid on
+plot(out.i_F_irr.Time, i_f_irr, '--', 'LineWidth', 2)
+grid on
 ylabel('Current [A]', 'FontSize', 13)
 title('Current comparison: Feedback vs Feedforward (with irradiance disturbance)', 'FontSize', 14)
-legend('Feedback', 'Feedforward', 'Location', 'best')
+legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 % ---------------- Power ----------------
@@ -170,10 +178,12 @@ plot(t_p_irr, p_fb_irr, 'LineWidth', 2)
 hold on
 plot(out.P_FF_irr.Time, p_ff_irr, '--', 'LineWidth', 2)
 grid on
+plot(out.P_F_irr.Time, p_f_irr, '--', 'LineWidth', 2)
+grid on
 xlabel('Time [s]', 'FontSize', 13)
 ylabel('Power [W]', 'FontSize', 13)
 title('Power comparison: Feedback vs Feedforward (with irradiance disturbance)', 'FontSize', 14)
-legend('Feedback', 'Feedforward', 'Location', 'best')
+legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 
@@ -219,7 +229,7 @@ title('Operating trajectories on PV curve')
 
 %% CHAT SITT PLOT AV PV-KURVE
 
-v = linspace(0,10,500);
+v = linspace(0,12,500);
 i2 = zeros(size(v));
 i3 = zeros(size(v));
 
@@ -249,7 +259,7 @@ title('Exact PV curves')
 
 %% PV curves for different irradiance levels (with R_s)
 
-v = linspace(0,20,500);
+v = linspace(0,12,500);
 
 G_levels = [200 500 800 1000]; % different irradiance values
 colors = lines(length(G_levels));
