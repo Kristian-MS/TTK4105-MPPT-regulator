@@ -32,7 +32,7 @@ R_sh_inv = 1/R_sh;
 
 R_N = 0.8; %For å gjøre FF dårligere (dobbeltsjekk om er i sim)
 
-tau = 10^(-5); %For å beregne strøm i diode model (derivere)
+tau = 10^(-3); %For å beregne strøm i diode model (derivere)
 
 
 
@@ -219,7 +219,7 @@ title('Operating trajectories on PV curve')
 
 %% CHAT SITT PLOT AV PV-KURVE
 
-v = linspace(0,20,500);
+v = linspace(0,10,500);
 i2 = zeros(size(v));
 i3 = zeros(size(v));
 
@@ -251,7 +251,7 @@ title('Exact PV curves')
 
 v = linspace(0,20,500);
 
-G_levels = [200 500 800 1000 1300]; % different irradiance values
+G_levels = [200 500 800 1000]; % different irradiance values
 colors = lines(length(G_levels));
 
 figure(30)
