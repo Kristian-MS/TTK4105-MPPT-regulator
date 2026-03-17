@@ -5,8 +5,8 @@ a = 20;
 b = 40;
 w = 0;
 
-n = 0.2;
-Vt = 10;
+n = 1.2;
+Vt = 0.8;
 ad = 1/(n*Vt);
 
 I_L = 5;
@@ -14,15 +14,15 @@ I_0 = 1e-4;
 
 % IRRADAINCE
 G_ref = 1/1000;
-tG = [0 2 4 6 8]';
-G  = [1000 1000 1000 300 300]';
+tG = [0 1 2 3 4 5 6 7 8 9 10]';
+G  = [1000 0 1000 0 500 1000 100 1000 0 1000 0]';
 G_signal = timeseries(G,tG);
 
 % MPP fra plot
-V_MMP = 13.7;
+V_MMP = 4.8;
 
 % FB variabler
-K_P = 0.5;
+K_P = 0.2;
 K_i = 5;
 
 % Motstand variabler
@@ -35,9 +35,11 @@ R_N = 0.8; %For å gjøre FF dårligere (dobbeltsjekk om er i sim)
 tau = 10^(-5); %For å beregne strøm i diode model (derivere)
 
 
+
+
 %% SIM AV DIODE MODEL ----------------------------
 
-v = linspace(0,20,500);
+v = linspace(0,12,500);
 i = I_L - I_0*(exp(v/(n*Vt))-1);
 P = v.*i;
 
@@ -59,6 +61,7 @@ grid on
 xlabel('v [V]')
 ylabel('P [W]')
 legend('R_s', 'R_N')
+
 
 %% Comparison plots: Feedback vs Feedforward (NO irradiance disturbance)
 
@@ -203,12 +206,14 @@ fprintf('FB irr: V = %.4f V, I = %.4f A, P = %.4f W\n', vFBirr_end, iFBirr_end, 
 figure(20)
 plot(v, P3, 'LineWidth', 2)
 hold on
+plot(v, P2, 'LineWidth', 2)
+hold on
 plot(out.v_FF.Data, out.P_FF.Data, '--', 'LineWidth', 1.5)
 plot(out.v_FB.Data, out.P_FB.Data, '-', 'LineWidth', 1.5)
 grid on
 xlabel('v [V]')
 ylabel('P [W]')
-legend('Static PV curve (plant with R_N)', 'FF trajectory', 'FB trajectory', 'Location', 'best')
+legend('Static PV curve (plant with R_N)', 'Static PV curve R_s', 'FF trajectory', 'FB trajectory', 'Location', 'best')
 title('Operating trajectories on PV curve')
 
 
@@ -240,3 +245,47 @@ xlabel('v [V]')
 ylabel('P [W]')
 legend('R_s plant', 'R_N plant', 'Location', 'best')
 title('Exact PV curves')
+
+
+%% PV curves for different irradiance levels (with R_s)
+
+v = linspace(0,20,500);
+
+G_levels = [200 500 800 1000 1300]; % different irradiance values
+colors = lines(length(G_levels));
+
+figure(30)
+hold on
+
+for g = 1:length(G_levels)
+
+    Gk = G_levels(g);
+    I_Lk = I_L * (Gk / 1000); % scale current with irradiance
+
+    i_k = zeros(size(v));
+
+    for k = 1:length(v)
+        vk = v(k);
+    
+        f = @(ii) I_Lk ...
+            - I_0*(exp(min((vk + ii*R_s)/(n*Vt), 100)) - 1) ...
+            - (vk + ii*R_s)/R_sh ...
+            - ii;
+    
+        try
+            i_k(k) = fzero(f, [0 I_Lk]);
+        catch
+            i_k(k) = 0;
+        end
+    end
+
+    P_k = v .* i_k;
+
+    plot(v, P_k, 'LineWidth', 2, 'Color', colors(g,:))
+end
+
+grid on
+xlabel('v [V]')
+ylabel('P [W]')
+title('PV curves for different irradiance levels (with R_s)')
+legend(string(G_levels) + " W/m^2", 'Location', 'best')
