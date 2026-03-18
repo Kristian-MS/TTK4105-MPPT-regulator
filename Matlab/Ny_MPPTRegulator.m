@@ -1,7 +1,7 @@
 %% Konstanter ----------------------
 
 a = 1;
-b = 40;
+b = 0.3;
 w = 0;
 
 n = 1.2;
@@ -24,7 +24,7 @@ G = 200 + (1000-200)*(rand(samples,1) > 0.5);
 G_signal = timeseries(G, tG);
 
 % MPP fra plot
-V_MMP = 4.8;
+V_MMP = 6.8;
 
 % FB variabler
 K_P = 0.2;
@@ -35,7 +35,7 @@ R_s = 0;
 R_sh = 500;
 R_sh_inv = 1/R_sh;
 
-R_N = 0.8; %For å gjøre FF dårligere (dobbeltsjekk om er i sim)
+R_N = 0; %For å gjøre FF dårligere (dobbeltsjekk om er i sim)
 R_Nsh = 500;
 
 tau = 10^(-5); %For å beregne strøm i diode model (derivere)
@@ -45,14 +45,14 @@ tau = 10^(-5); %For å beregne strøm i diode model (derivere)
 
 %% SIM AV DIODE MODEL ----------------------------
 
-v = linspace(0,12,500);
+v = linspace(0,10.4,500);
 i = I_L - I_0*(exp(v/(n*Vt))-1);
-P = v.*i;
+P  = max(v.*i, 0);
 
 i2 = I_L -I_0*(exp((v+i*R_s)/(n*Vt))-1) - (v+i*R_s)/R_sh;
-i3 = I_L -I_0*(exp((v+i*R_N)/(n*Vt))-1) - (v+i*R_N)/R_Nsh;
-P2 = v.*i2;
-P3 = v.*i3;
+i3 = I_L -I_0*(exp((v+i*R_N)/(1*Vt))-1) - (v+i*R_N)/R_Nsh;
+P2 = max(v.*i2, 0);
+P3 = max(v.*i3, 0);
 
 figure(5)
 plot(v,P), grid on
@@ -248,8 +248,8 @@ for k = 1:length(v)
     i3(k) = fzero(f3, I_L);
 end
 
-P2 = v .* i2;
-P3 = v .* i3;
+P2 = max(v .* i2, 0);
+P3 = max(v .* i3, 0);
 
 figure(21)
 plot(v, P2, 'LineWidth', 2)
