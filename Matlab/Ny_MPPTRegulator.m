@@ -1,7 +1,6 @@
-
 %% Konstanter ----------------------
 
-a = 20;
+a = 1;
 b = 40;
 w = 0;
 
@@ -12,11 +11,17 @@ ad = 1/(n*Vt);
 I_L = 5;
 I_0 = 1e-4;
 
+f_sample = 100; %hz
+
+slew_rate = 2;
+
 % IRRADAINCE
 G_ref = 1/1000;
-tG = [0 1 2 3 4 5 6 7 8 9 10]';
-G  = [1000 1000 1000 1000 0 1000 1000 1000 1000 1000 0]';
-G_signal = timeseries(G,tG);
+
+samples = 100;
+tG = (0:samples-1)';
+G = 200 + (1000-200)*(rand(samples,1) > 0.5);
+G_signal = timeseries(G, tG);
 
 % MPP fra plot
 V_MMP = 4.8;
