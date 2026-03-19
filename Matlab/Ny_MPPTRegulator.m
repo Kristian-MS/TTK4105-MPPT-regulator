@@ -18,7 +18,7 @@ slew_rate = 2;
 % IRRADAINCE
 G_ref = 1/1000;
 
-samples = 100;
+samples = 20;
 tG = (0:samples-1)';
 G = 200 + (1000-200)*(rand(samples,1) > 0.5);
 G_signal = timeseries(G, tG);
@@ -28,7 +28,7 @@ V_MMP = 6.8;
 
 % FB variabler
 K_P = 0.2;
-K_i = 5;
+K_i = 2;
 
 % Motstand variabler
 R_s = 0;
@@ -304,3 +304,120 @@ xlabel('v [V]')
 ylabel('P [W]')
 title('PV curves for different irradiance levels (with R_s)')
 legend(string(G_levels) + " W/m^2", 'Location', 'best')
+
+out.e_FB_irr
+out.e_F_irr
+
+out.u_FB_irr
+out.u_FF_irr
+out.u_F_irr
+
+
+%% Ekstra plots: pådrag, error, IAE, Power alene, Voltage alene
+
+% ==============================
+% 1) Pådrag for tre kontroller
+% ==============================
+t_u_fb = out.u_FB_irr.Time;
+u_fb   = out.u_FB_irr.Data;
+
+t_u_ff = out.u_FF_irr.Time;
+u_ff   = out.u_FF_irr.Data;
+
+t_u_f  = out.u_F_irr.Time;
+u_f    = out.u_F_irr.Data;
+
+figure(40)
+plot(t_u_fb, u_fb, 'LineWidth', 2)
+hold on
+plot(t_u_ff, u_ff, '--', 'LineWidth', 2)
+hold on
+plot(t_u_f,  u_f,  '-.', 'LineWidth', 2)
+grid on
+xlabel('Time [s]', 'FontSize', 13)
+ylabel('Control input u', 'FontSize', 13)
+title('Control effort comparison: FB vs FF vs FF+FB', 'FontSize', 14)
+legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
+set(gca, 'FontSize', 12)
+
+
+% ==============================
+% 2) Error for F og FB
+% ==============================
+t_e_fb = out.e_FB_irr.Time;
+e_fb   = out.e_FB_irr.Data;
+
+t_e_f  = out.e_F_irr.Time;
+e_f    = out.e_F_irr.Data;
+
+figure(41)
+plot(t_e_fb, e_fb, 'LineWidth', 2)
+hold on
+plot(t_e_f,  e_f, '--', 'LineWidth', 2)
+grid on
+xlabel('Time [s]', 'FontSize', 13)
+ylabel('Error', 'FontSize', 13)
+title('Error comparison: FB vs FF+FB', 'FontSize', 14)
+legend('Feedback error', 'FF+FB error', 'Location', 'best')
+set(gca, 'FontSize', 12)
+
+
+% ==============================
+% 3) IAE (Integral of Absolute Error)
+% ==============================
+% Interpolerer til felles tidsakse dersom nødvendig
+t_common = t_e_fb;
+
+e_f_interp = interp1(t_e_f, e_f, t_common, 'linear', 'extrap');
+e_fb_interp = interp1(t_e_fb, e_fb, t_common, 'linear', 'extrap');
+
+IAE_fb = cumtrapz(t_common, abs(e_fb_interp));
+IAE_f  = cumtrapz(t_common, abs(e_f_interp));
+
+figure(42)
+plot(t_common, IAE_fb, 'LineWidth', 2)
+hold on
+plot(t_common, IAE_f, '--', 'LineWidth', 2)
+grid on
+xlabel('Time [s]', 'FontSize', 13)
+ylabel('IAE', 'FontSize', 13)
+title('Integral of Absolute Error (IAE)', 'FontSize', 14)
+legend('FB', 'FF+FB', 'Location', 'best')
+set(gca, 'FontSize', 12)
+
+% Eventuelt skriv ut sluttverdi for IAE
+fprintf('\n--- IAE values ---\n');
+fprintf('FB IAE     = %.6f\n', IAE_fb(end));
+fprintf('FF+FB IAE  = %.6f\n', IAE_f(end));
+
+
+% ==============================
+% 4) Power alene
+% ==============================
+figure(43)
+plot(t_p_irr, p_fb_irr, 'LineWidth', 2)
+hold on
+plot(out.P_FF_irr.Time, p_ff_irr, '--', 'LineWidth', 2)
+plot(out.P_F_irr.Time,  p_f_irr, '-.', 'LineWidth', 2)
+grid on
+xlabel('Time [s]', 'FontSize', 13)
+ylabel('Power [W]', 'FontSize', 13)
+title('Power comparison', 'FontSize', 14)
+legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
+set(gca, 'FontSize', 12)
+
+
+% ==============================
+% 5) Voltage alene
+% ==============================
+figure(44)
+plot(t_v_irr, v_fb_irr, 'LineWidth', 2)
+hold on
+plot(out.v_FF_irr.Time, v_ff_irr, '--', 'LineWidth', 2)
+plot(out.v_F_irr.Time,  v_f_irr, '-.', 'LineWidth', 2)
+grid on
+xlabel('Time [s]', 'FontSize', 13)
+ylabel('Voltage [V]', 'FontSize', 13)
+title('Voltage comparison', 'FontSize', 14)
+legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
+set(gca, 'FontSize', 12)
