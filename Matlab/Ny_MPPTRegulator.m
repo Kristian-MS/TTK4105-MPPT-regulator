@@ -45,7 +45,7 @@ tau = 10^(-5); %For å beregne strøm i diode model (derivere)
 
 %% SIM AV DIODE MODEL ----------------------------
 
-v = linspace(0,14,500);
+v = linspace(0,10.2,500);
 i = I_L - I_0*(exp(v/(n*Vt))-1);
 P  = max(v.*i, 0);
 
@@ -60,13 +60,14 @@ xlabel('v [V]')
 ylabel('P [W]')
 
 figure(6)
-plot(v, P2)
+plot(v, P2, 'LineWidth', 2)
 hold on
-plot(v, P3)
+plot(v, P3, 'LineWidth', 2)
 grid on
 xlabel('v [V]')
 ylabel('P [W]')
-legend('R_s', 'R_N')
+legend('n = 1.2', 'n = 1')
+title('PV-kurve for forskjellig idealitetsfaktorer')
 
 
 %% Comparison plots: Feedback vs Feedforward (NO irradiance disturbance)
@@ -138,16 +139,19 @@ t_v_irr  = out.v_FB_irr.Time;
 v_fb_irr = out.v_FB_irr.Data;
 v_ff_irr = out.v_FF_irr.Data;
 v_f_irr = out.v_F_irr.Data;
+v_ff_irr1 = out.v_FF_irr1.Data;
 
 t_i_irr  = out.i_FB_irr.Time;
 i_fb_irr = out.i_FB_irr.Data;
 i_ff_irr = out.i_FF_irr.Data;
 i_f_irr = out.i_F_irr.Data;
+i_ff_irr1 = out.i_FF_irr1.Data;
 
 t_p_irr  = out.P_FB_irr.Time;
 p_fb_irr = out.P_FB_irr.Data;
 p_ff_irr = out.P_FF_irr.Data;
 p_f_irr = out.P_F_irr.Data;
+p_ff_irr1 = out.P_FF_irr1.Data;
 
 figure(11)
 tiledlayout(4,1, "TileSpacing","compact", "Padding","compact")
@@ -168,9 +172,11 @@ plot(out.v_FF_irr.Time, v_ff_irr, '--', 'LineWidth', 2)
 grid on
 plot(out.v_F_irr.Time, v_f_irr, '--', 'LineWidth', 2)
 grid on
+plot(out.v_FF_irr1.Time, v_ff_irr1, '--', 'LineWidth', 2)
+grid on
 ylabel('Voltage [V]', 'FontSize', 13)
 title('Voltage comparison: Feedback vs Feedforward (with irradiance disturbance)', 'FontSize', 14)
-legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
+legend('Feedback', 'Feedforward', 'FF+FB', 'FF_G', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 % ---------------- Current ----------------
@@ -181,9 +187,11 @@ plot(out.i_FF_irr.Time, i_ff_irr, '--', 'LineWidth', 2)
 grid on
 plot(out.i_F_irr.Time, i_f_irr, '--', 'LineWidth', 2)
 grid on
+plot(out.i_FF_irr1.Time, i_ff_irr1, '--', 'LineWidth', 2)
+grid on
 ylabel('Current [A]', 'FontSize', 13)
 title('Current comparison: Feedback vs Feedforward (with irradiance disturbance)', 'FontSize', 14)
-legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
+legend('Feedback', 'Feedforward', 'FF+FB', 'FF_G', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 % ---------------- Power ----------------
@@ -194,10 +202,12 @@ plot(out.P_FF_irr.Time, p_ff_irr, '--', 'LineWidth', 2)
 grid on
 plot(out.P_F_irr.Time, p_f_irr, '--', 'LineWidth', 2)
 grid on
+plot(out.P_FF_irr1.Time, p_ff_irr1, '--', 'LineWidth', 2)
+grid on
 xlabel('Time [s]', 'FontSize', 13)
 ylabel('Power [W]', 'FontSize', 13)
 title('Power comparison: Feedback vs Feedforward (with irradiance disturbance)', 'FontSize', 14)
-legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
+legend('Feedback', 'Feedforward', 'FF+FB', 'FF_G', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 
