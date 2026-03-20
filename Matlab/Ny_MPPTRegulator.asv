@@ -75,6 +75,7 @@ legend('R_s', 'R_N')
 t_v  = out.v_FB.Time;
 v_fb = out.v_FB.Data;
 v_ff = out.v_FF.Data;
+v_f = 
 
 t_i  = out.i_FB.Time;
 i_fb = out.i_FB.Data;
@@ -350,17 +351,20 @@ e_fb   = out.e_FB_irr.Data;
 t_e_f  = out.e_F_irr.Time;
 e_f    = out.e_F_irr.Data;
 
-t_e_ff = out.e_FF_irr.Time
+t_e_ff = out.e_FF_irr.Time;
+e_ff   = out.e_FF_irr.Data;
 
 figure(41)
 plot(t_e_fb, e_fb, 'LineWidth', 2)
 hold on
 plot(t_e_f,  e_f, '--', 'LineWidth', 2)
+hold on
+plot(t_e_ff, e_ff, '--', 'LineWidth', 2)
 grid on
 xlabel('Time [s]', 'FontSize', 13)
 ylabel('Error', 'FontSize', 13)
 title('Error comparison: FB vs FF+FB', 'FontSize', 14)
-legend('Feedback error', 'FF+FB error', 'Location', 'best')
+legend('Feedback error', 'FF+FB error', 'FF error', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 
@@ -372,19 +376,23 @@ t_common = t_e_fb;
 
 e_f_interp = interp1(t_e_f, e_f, t_common, 'linear', 'extrap');
 e_fb_interp = interp1(t_e_fb, e_fb, t_common, 'linear', 'extrap');
+e_ff_interp = interp1(t_e_ff, e_ff, t_common, 'linear', 'extrap');
 
 IAE_fb = cumtrapz(t_common, abs(e_fb_interp));
 IAE_f  = cumtrapz(t_common, abs(e_f_interp));
+IAE_ff = cumtrapz(t_common, abs(e_ff_interp));
 
 figure(42)
 plot(t_common, IAE_fb, 'LineWidth', 2)
 hold on
 plot(t_common, IAE_f, '--', 'LineWidth', 2)
+hold on
+plot(t_common, IAE_ff, '--', 'LineWidth', 2)
 grid on
 xlabel('Time [s]', 'FontSize', 13)
 ylabel('IAE', 'FontSize', 13)
 title('Integral of Absolute Error (IAE)', 'FontSize', 14)
-legend('FB', 'FF+FB', 'Location', 'best')
+legend('FB', 'FF+FB', 'FF', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 % Eventuelt skriv ut sluttverdi for IAE

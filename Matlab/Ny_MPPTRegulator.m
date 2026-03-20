@@ -45,7 +45,7 @@ tau = 10^(-5); %For å beregne strøm i diode model (derivere)
 
 %% SIM AV DIODE MODEL ----------------------------
 
-v = linspace(0,10.4,500);
+v = linspace(0,14,500);
 i = I_L - I_0*(exp(v/(n*Vt))-1);
 P  = max(v.*i, 0);
 
@@ -75,14 +75,17 @@ legend('R_s', 'R_N')
 t_v  = out.v_FB.Time;
 v_fb = out.v_FB.Data;
 v_ff = out.v_FF.Data;
+v_f  = out.v_F.Data;
 
 t_i  = out.i_FB.Time;
 i_fb = out.i_FB.Data;
 i_ff = out.i_FF.Data;
+i_f  = out.i_F.Data;
 
 t_p  = out.P_FB.Time;
 p_fb = out.P_FB.Data;
 p_ff = out.P_FF.Data;
+p_f  = out.P_F.Data;
 
 figure(10)
 tiledlayout(3,1, "TileSpacing","compact", "Padding","compact")
@@ -92,10 +95,12 @@ nexttile
 plot(t_v, v_fb, 'LineWidth', 2)
 hold on
 plot(out.v_FF.Time, v_ff, '--', 'LineWidth', 2)
+hold on
+plot(out.v_F.Time, v_f, '--', 'LineWidth', 2)
 grid on
 ylabel('Voltage [V]', 'FontSize', 13)
 title('Voltage comparison: Feedback vs Feedforward (no irradiance disturbance)', 'FontSize', 14)
-legend('Feedback', 'Feedforward', 'Location', 'best')
+legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 % ---------------- Current ----------------
@@ -103,10 +108,12 @@ nexttile
 plot(t_i, i_fb, 'LineWidth', 2)
 hold on
 plot(out.i_FF.Time, i_ff, '--', 'LineWidth', 2)
+hold on
+plot(out.i_F.Time, i_f, '--', 'LineWidth', 2)
 grid on
 ylabel('Current [A]', 'FontSize', 13)
 title('Current comparison: Feedback vs Feedforward (no irradiance disturbance)', 'FontSize', 14)
-legend('Feedback', 'Feedforward', 'Location', 'best')
+legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 % ---------------- Power ----------------
@@ -114,11 +121,13 @@ nexttile
 plot(t_p, p_fb, 'LineWidth', 2)
 hold on
 plot(out.P_FF.Time, p_ff, '--', 'LineWidth', 2)
+hold on
+plot(out.P_F.Time, p_f, '--', 'LineWidth', 2)
 grid on
 xlabel('Time [s]', 'FontSize', 13)
 ylabel('Power [W]', 'FontSize', 13)
 title('Power comparison: Feedback vs Feedforward (no irradiance disturbance)', 'FontSize', 14)
-legend('Feedback', 'Feedforward', 'Location', 'best')
+legend('Feedback', 'Feedforward', 'FF+FB', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 
