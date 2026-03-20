@@ -45,7 +45,7 @@ tau = 10^(-5); %For å beregne strøm i diode model (derivere)
 
 %% SIM AV DIODE MODEL ----------------------------
 
-v = linspace(0,10.2,500);
+v = linspace(0,12,500);
 i = I_L - I_0*(exp(v/(n*Vt))-1);
 P  = max(v.*i, 0);
 
